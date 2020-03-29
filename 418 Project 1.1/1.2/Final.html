@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>444</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
+<!--"https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js""https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"--> 
+<script>
+var bullets;
+var asteroids;
+var ship;
+var shipImage, bulletImage, particleImage;
+var MARGIN = 40;
+
+function setup() {
+  createCanvas(800, 600);
+  canvas.parent('game.div');
+
+  bulletImage = loadImage('assets/asteroids_bullet.png');
+  shipImage = loadImage('assets/asteroids_ship0001.png');
+  particleImage = loadImage('assets/asteroids_particle.png');
+
+  ship = createSprite(width/2, height/2);
+  ship.maxSpeed = 6;
+  ship.friction = 0.98;
+  ship.setCollider('circle', 0, 0, 20);
+
+  ship.addImage('normal', shipImage);
+  ship.addAnimation('thrust', 'assets/asteroids_ship0002.png', 'assets/asteroids_ship0007.png');
+
+  asteroids = new Group();
+  bullets = new Group();
+
+  for(var i = 0; i<8; i++) {
+    var ang = random(360);
+    var px = width/2 + 1000 * cos(radians(ang));
+    var py = height/2+ 1000 * sin(radians(ang));
+    createAsteroid(3, px, py);
+  }
+}
+
+function draw() {
+  background(0);
+
+  fill(255);
+  textAlign(CENTER);
+  text('Controls: Arrow Keys + X', width/2, 20);
+
+  for(var i=0; i<allSprites.length; i++) {
+    var s = allSprites[i];
+    if(s.position.x<-MARGIN) s.position.x = width+MARGIN;
+    if(s.position.x>width+MARGIN) s.position.x = -MARGIN;
+    if(s.position.y<-MARGIN) s.position.y = height+MARGIN;
+    if(s.position.y>height+MARGIN) s.position.y = -MARGIN;
+  }
+
+  asteroids.overlap(bullets, asteroidHit);
+
+  ship.bounce(asteroids);
+
+  if(keyDown(LEFT_ARROW))
+    ship.rotation -= 4;
+  if(keyDown(RIGHT_ARROW))
+    ship.rotation += 4;
+  if(keyDown(UP_ARROW))
+  {
+    ship.addSpeed(0.2, ship.rotation);
+    ship.changeAnimation('thrust');
+  }
+  else
+    ship.changeAnimation('normal');
+
+  if(keyWentDown('x'))
+  {
+    var bullet = createSprite(ship.position.x, ship.position.y);
+    bullet.addImage(bulletImage);
+    bullet.setSpeed(10+ship.getSpeed(), ship.rotation);
+    bullet.life = 30;
+    bullets.add(bullet);
+  }
+
+  drawSprites();
+
+}
+
+function createAsteroid(type, x, y) {
+  var a = createSprite(x, y);
+  var img = loadImage('assets/asteroid'+floor(random(0, 3))+'.png');
+  a.addImage(img);
+  a.setSpeed(2.5-(type/2), random(360));
+  a.rotationSpeed = 0.5;
+  //a.debug = true;
+  a.type = type;
+
+  if(type == 2)
+    a.scale = 0.6;
+  if(type == 1)
+    a.scale = 0.3;
+
+  a.mass = 2+a.scale;
+  a.setCollider('circle', 0, 0, 50);
+  asteroids.add(a);
+  return a;
+}
+
+function asteroidHit(asteroid, bullet) {
+  var newType = asteroid.type-1;
+
+  if(newType>0) {
+    createAsteroid(newType, asteroid.position.x, asteroid.position.y);
+    createAsteroid(newType, asteroid.position.x, asteroid.position.y);
+  }
+
+  for(var i=0; i<10; i++) {
+    var p = createSprite(bullet.position.x, bullet.position.y);
+    p.addImage(particleImage);
+    p.setSpeed(random(3, 5), random(360));
+    p.friction = 0.95;
+    p.life = 15;
+  }
+
+  bullet.remove();
+  asteroid.remove();
+}
+
+</script>
+<!-- I genuinly have no idea why the p5 thing doesn't work. I followed the directions I think -->
+<style>
+	.header-display {
+		width: 990px;
+		height: 500px;
+    	margin: auto;
+		padding: 194px;
+		background-size: 100% 100%;
+	}
+	.video1 {
+		border: 10px #595959;
+		margin: auto;
+		width: 100%;
+		
+	}
+	div.header-text {
+		color: white;
+		text-align: center;
+		font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+		font-size: 36px;
+		
+	}
+	.h1 {
+		color: white;
+		text-align: center;
+		font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+		padding: inherit;
+		font-size: 34px;
+		
+	}
+	.p {
+		color: grey;
+		font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+		font-size: 18px;
+		max-width:1500px;
+  		margin: auto;
+		border: thick #1A468F;
+		max-width: 1200px;
+	
+	}
+	footer {
+  		background-color: #777;
+ 		padding: 40px;
+	
+	}
+	header {
+ 		background-color: #666;
+  		padding: 30px;
+  		
+	}
+	
+</style>			
+</head> 
+
+<body>
+	<video controls loop class="video1" autoplay>
+		<source src="spaceX.mp4" type="video/mp4">
+	</video>
+	<footer></footer>
+	<div class="header-display" style="background-image: url(andromeda.jpg)">
+		<div class="header-text">Somewhere, something incredible is waiting to be known.</div>
+		<div class="header-text"> - Carl Sagan</div>
+	</div>
+	<div class="header-display" style="background-image: url(falcon9.jpg)">
+		<div class="header-text">SpaceX designs, manufactures and launches advanced rockets and spacecraft. The company was founded in 2002 to revolutionize space technology, with the ultimate goal of enabling people to live on other planets.</div>
+	</div>
+	<header>
+		<h1 class="h1">MAKING HISTORY</h1>
+	</header>
+	<p class="p">SpaceX has gained worldwide attention for a series of historic milestones. It is the only private company capable of returning a spacecraft from low Earth orbit, which it first accomplished in 2010. The company made history again in 2012 when its Dragon spacecraft became the first commercial spacecraft to deliver cargo to and from the International Space Station.</p>
+	<p class="p">SpaceX successfully achieved the historic first reflight of an orbital class rocket in 2017, and the company now regularly launches flight-proven rockets. In 2018, SpaceX began launching Falcon Heavy, the world’s most powerful operational rocket by a factor of two.</p>
+	<footer></footer>
+	<video controls loop class="video1" autoplay>
+		<source src="animation.mp4" type="video/mp4">
+	</video>
+	<footer></footer>
+	<div id="game.div"></div>
+</body>
+</html>

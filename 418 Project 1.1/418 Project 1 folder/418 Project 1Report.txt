@@ -1,0 +1,20 @@
+Report created: 
+	3/22/2020	10:29:57 AM
+
+Project name: 418 Project 1.aep
+
+Source files collected to: 
+	C:\Users\joeto\OneDrive\Documents\418 Project 1.1\418 Project 1 folder
+
+Source files collected: For selected comps
+
+Collected comps:  
+	Rocket 1
+	
+Number of collected files:  0
+
+Size of collected files:  0 KB
+
+Rendering plug-ins:
+	Classic 3D
+	
